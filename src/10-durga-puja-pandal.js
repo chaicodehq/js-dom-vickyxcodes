@@ -91,24 +91,97 @@
  */
 export function createPandalElement(pandal) {
   // Your code here
+  if(!pandal || !pandal.name || !pandal.zone || !pandal.theme || !pandal.budget ||!pandal.rating) return null;
+  if(typeof pandal.budget !== "number" || Number.isNaN(pandal.budget)) return null;
+  if(typeof pandal.rating !== "number" || Number.isNaN(pandal.rating)) return null;
+
+
+  const { name, zone, theme, budget, rating } = pandal;
+
+  const div = document.createElement("div");
+  div.className = "pandal";
+  div.dataset.name = name;
+  div.dataset.zone = zone;
+  div.dataset.theme = theme;
+  div.dataset.budget = budget;
+  div.dataset.rating = rating;
+  div.textContent = name;
+
+  return div;
 }
 
 export function getPandalInfo(element) {
   // Your code here
+  if(!element) return null;
+
+  return {
+    name : element.dataset.name,
+    zone : element.dataset.zone,
+    theme : element.dataset.theme,
+    budget : +element.dataset.budget,
+    rating : +element.dataset.rating,
+  }
 }
 
 export function updatePandalRating(element, newRating) {
   // Your code here
+  if(!element) return null;
+  if(typeof newRating !== "number" || Number.isNaN(newRating) || newRating < 0 || newRating > 5) return null;
+
+  const oldRating = element.dataset.rating;
+
+  element.dataset.rating = newRating.toString();
+
+  return +oldRating;
 }
 
 export function filterPandalsByZone(container, zone) {
   // Your code here
+  if(!container) return [];
+  if(typeof zone !== "string") return [];
+
+  const childs = container.children;
+
+
+  const arr = [];
+  for(let i = 0; i < childs.length; i++){
+    if(childs[i].classList.contains("pandal")){
+      if(childs[i].dataset.zone === zone) arr.push(childs[i]); 
+    }
+  }
+
+  return arr;
 }
 
 export function getPandalsByBudgetRange(container, min, max) {
   // Your code here
+  if(!container || typeof min !== "number" || Number.isNaN(min) || typeof max !== "number" || Number.isNaN(max)) return [];
+  
+  const list = Array.from(container.children);
+  const arr = [];
+  list.forEach(element => {
+    if(element.classList.contains("pandal")){
+      if(+element.dataset.budget <= max && +element.dataset.budget >= min) arr.push(element);
+    }
+  });
+
+  return arr;
 }
 
 export function sortPandalsByRating(container) {
   // Your code here
+  if(!container) return [];
+
+  const list = Array.from(container.children);
+  const pandalList = list.filter(e => e.classList.contains("pandal"));
+
+  pandalList.sort((a,b) => {
+    if(+a.dataset.rating < +b.dataset.rating) return 1;
+    if(+a.dataset.rating > +b.dataset.rating) return -1;
+    return 0;
+  })
+
+  pandalList.forEach(e => container.appendChild(e));
+
+  return pandalList;
 }
